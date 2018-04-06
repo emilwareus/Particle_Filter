@@ -162,7 +162,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		//Vector of landmarks within sensor range
 		vector<LandmarkObs> predictions;
-		for(int land = 0 ; land < map_landmarkslandmark_list.length; land ++){
+		for(int land = 0 ; land < map_landmarks.landmark_list.size(); land ++){
 			float lx = map_landmarks.landmark_list[land].x_f;
       		float ly = map_landmarks.landmark_list[land].y_f;
 			int id = map_landmarks.landmark_list[land].id_i;
@@ -193,13 +193,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<double> sense_y;
 
 		// Calculate particle weight
-		for(int j=0; j<observations_map.length; j++){
+		for(int j=0; j<observations_map.size(); j++){
 			// get the x,y coordinates of the landmark
-			for (unsigned int k = 0; k < predictions.length; k++) {
+			double weight = 0.0;
+			for (unsigned int k = 0; k < predictions.size(); k++) {
 				if (predictions[k].id == observations_map[j].id) {
-					mu_x = predictions[k].x;
-					mu_y = predictions[k].y;
-					double weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map.x, observations_map.y, predictions[k].x, predictions[k].y);
+					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map.x_f, observations_map.y_f, predictions[k].x, predictions[k].y);
 					break;
 				}
 			}
@@ -230,7 +229,7 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	default_random_engine gen;
-	
+
 	weights.clear();
 	for(int i = 0; i < num_particles; i++){
 		weights.push_back(particles[i].weight);
@@ -242,9 +241,9 @@ void ParticleFilter::resample() {
 	updated_particles.resize(num_particles);
 	for(int i=0; i<num_particles; i++){
 		auto index = particle_dist(gen);
-		update_particles[i] = move(particles[index]);
+		updated_particles[i] = move(particles[index]);
 	}
-	particles = move(update_particles);
+	particles = move(updated_particles);
 
 }
 
