@@ -248,9 +248,9 @@ void ParticleFilter::resample() {
 	for(int i=0; i<num_particles; i++){
 		auto index = particle_dist(gen);
 		updated_particles[i] = move(particles[index]);
-		cout << updated_particles[i] << endl;
+		
 	}
-	particles = move(updated_particles);
+	particles = updated_particles;
 	cout << "Resampeling done!" << endl;
 }
 
