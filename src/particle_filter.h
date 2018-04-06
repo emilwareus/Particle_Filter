@@ -37,6 +37,10 @@ class ParticleFilter {
 	
 	// Vector of weights of all particles
 	std::vector<double> weights;
+
+
+	// Randomly samples particles into "particles" object.
+	void gaussian_init(double gps_x, double gps_y, double theta, double std_x, double std_y, double std_theta, int num_particles);
 	
 public:
 	

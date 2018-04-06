@@ -27,7 +27,7 @@ using namespace std;
 // @param gps_x 	GPS provided x position
 // @param gps_y 	GPS provided y position
 // @param theta		GPS provided yaw
-void printSamples(double gps_x, double gps_y, double theta, double std_x, double std_y, double std_theta, int num_particles) {
+void ParticleFilter::gaussian_init(double gps_x, double gps_y, double theta, double std_x, double std_y, double std_theta, int num_particles) {
 	default_random_engine gen;
 	// Standard deviations for x, y, and theta
 
@@ -65,7 +65,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	particles.clear();
 	num_particles = 50;	
 
-	printSamples(x, y, theta, std[0], std[1], std[2], num_particles);
+	gaussian_init(x, y, theta, std[0], std[1], std[2], num_particles);
 	
 	bool is_initialized = true;
 	
@@ -78,6 +78,27 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
+
+	default_random_engine gen;
+	normal_distribution<double> dist_x(0, std[0]);
+	normal_distribution<double> dist_y(0, std[1]);
+	normal_distribution<double> dist_theta(0, std[2]);
+
+	for(int i = 0; i < num_particles; i++){
+		if (fabs(yaw_rate) < EPS){
+			particles[i].x += velocity*delta_t*(sin(particles[i].theta));
+			particles[i].y += velocity*delta_t*(sin(particles[i].theta);
+		else{
+			particles[i].x += velocity/yaw_rate*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta));
+			particles[i].y += velocity/yaw_rate*(-cos(particles[i].theta + yaw_rate*delta_t) + cos(particles[i].theta));
+			particles[i].theta += yaw_rate/delta_t;
+		}
+
+		particles[i].x +=  dist_x(gen);
+		particles[i].y +=  dist_y(gen);
+		particles[i].theta +=  dist_theta(gen);
+	}
+
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
@@ -85,6 +106,25 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	//   observed measurement to this particular landmark.
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
+
+	for(int i = 0; i < observations.length; i++){
+
+		double min = numeric_limits<double>::max();
+		int id = 0;
+
+		for(int pred = 0; pred < predicted.length; pred++){
+			
+			double dist = dist(observations[i].x, observations[i].y, predicted[pred].x, predicted[pred].y);
+
+			if(dist < min){
+				min = dist;
+				id = predicted[pred].id;
+			}
+
+
+		}
+		observations[i].id = id; 
+	}
 
 }
 
