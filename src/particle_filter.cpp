@@ -67,34 +67,35 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	
 	num_particles = 50;	
 
-	default_random_engine gen;
-	// Standard deviations for x, y, and theta
+	if(!is_initialized){
+		default_random_engine gen;
+		// Standard deviations for x, y, and theta
 
-	// This line creates a normal (Gaussian) distribution for x, y and theta
-	normal_distribution<double> dist_x(x, std[0]);
-	normal_distribution<double> dist_y(y, std[1]);
-	normal_distribution<double> dist_theta(theta, std[2]);
-	
-	for (int i = 0; i < num_particles; ++i) {
-		double sample_x, sample_y, sample_theta;
-		
-		sample_x = dist_x(gen);
-		sample_y = dist_y(gen);
-		sample_theta = dist_theta(gen);	 
+		// This line creates a normal (Gaussian) distribution for x, y and theta
+		normal_distribution<double> dist_x(x, std[0]);
+		normal_distribution<double> dist_y(y, std[1]);
+		normal_distribution<double> dist_theta(theta, std[2]);
 
-		Particle part;
-		part.id = i;
-		part.x = sample_x;
-		part.y = sample_y;
-		part.theta = sample_theta;
-		part.weight = 1.0;
-		cout << part.weight << endl;
-		
-		weights.push_back(part.weight);
-		particles.push_back(part);				
-		 
+		for (int i = 0; i < num_particles; ++i) {
+			double sample_x, sample_y, sample_theta;
+			
+			sample_x = dist_x(gen);
+			sample_y = dist_y(gen);
+			sample_theta = dist_theta(gen);	 
+
+			Particle part = Particle();
+			part.id = i;
+			part.x = sample_x;
+			part.y = sample_y;
+			part.theta = sample_theta;
+			part.weight = 1.0;
+			cout << part.weight << endl;
+			
+			weights.push_back(part.weight);
+			particles.push_back(part);				
+				
+		}
 	}
-
 	
 	bool is_initialized = true;
 	

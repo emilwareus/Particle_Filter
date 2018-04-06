@@ -116,7 +116,7 @@ int main()
       
 		  // Calculate and output the average weighted error of the particle filter over all time steps so far.
       
-		  vector<Particle> particles = move(pf.particles);
+		  vector<Particle> particles = pf.particles;
       
 		  int num_particles = particles.size();
       
