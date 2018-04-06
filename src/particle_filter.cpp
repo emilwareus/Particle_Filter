@@ -39,9 +39,9 @@ void ParticleFilter::gaussian_init(double gps_x, double gps_y, double theta, dou
 	for (int i = 0; i < num_particles; ++i) {
 		double sample_x, sample_y, sample_theta;
 		
-		 sample_x = dist_x(gen);
-		 sample_y = dist_y(gen);
-		 sample_theta = dist_theta(gen);	 
+		sample_x = dist_x(gen);
+		sample_y = dist_y(gen);
+		sample_theta = dist_theta(gen);	 
 
 		Particle part;
 		part.id = i;
@@ -49,7 +49,7 @@ void ParticleFilter::gaussian_init(double gps_x, double gps_y, double theta, dou
 		part.y = sample_y;
 		part.theta = sample_theta;
 		part.weight = 1.0;
-
+		cout << part.weight << endl;
 		particles.push_back(part);				
 		 
 	}
@@ -79,7 +79,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-	cout << "Let's Predict!"<< endl;
+	
 	default_random_engine gen;
 	normal_distribution<double> dist_x(0, std_pos[0]);
 	normal_distribution<double> dist_y(0, std_pos[1]);
@@ -100,8 +100,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particles[i].theta +=  dist_theta(gen);
 	}
 
-	cout << "Prediction done!"<< endl;
-
+	
 }
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
@@ -160,7 +159,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   http://planning.cs.uiuc.edu/node99.html
 
 
-	cout << "Let's update the weights" << endl;
+	
 	//Loop over all particles 
 	for(int i = 0; i < num_particles; i++){
 
@@ -225,7 +224,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		particles[i] = SetAssociations(particles[i], associations, sense_x, sense_y);
 
 	}
-	cout << "Weights done!"<< endl;
+	
 }
 
 void ParticleFilter::resample() {
@@ -233,7 +232,7 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	
-	cout << "What if we resample?" << endl;
+	
 	default_random_engine gen;
 
 	weights.clear();
@@ -251,7 +250,7 @@ void ParticleFilter::resample() {
 		
 	}
 	particles = move(updated_particles);
-	cout << "Resampeling done!" << endl;
+	
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 

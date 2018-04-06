@@ -113,28 +113,25 @@ int main()
 		  // Update the weights and resample
 		  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
 		  pf.resample();
-      cout << "Test 1 " << endl;
+      
 		  // Calculate and output the average weighted error of the particle filter over all time steps so far.
-      cout << "Test size "<< pf.particles.size() << endl;
+      
 		  vector<Particle> particles = move(pf.particles);
-      cout << "Test 12 " << endl;
+      
 		  int num_particles = particles.size();
-      cout << "Test 13 " << endl;
+      
 		  double highest_weight = -1.0;
-      cout << "Test 14 " << endl;
-		  Particle best_particle;
-      cout << "Test 15 " << endl;
-		  double weight_sum = 0.0;
-      cout << "Test 2 " << endl;
-		  for (int i = 0; i < num_particles; ++i) {
+      Particle best_particle;
+      double weight_sum = 0.0;
+      for (int i = 0; i < num_particles; ++i) {
+        cout << particles[i].weight << endl;
 			if (particles[i].weight > highest_weight) {
 				highest_weight = particles[i].weight;
 				best_particle = particles[i];
 			}
 			weight_sum += particles[i].weight;
 		  }
-      cout << "Test 3 " << endl;
-		  cout << "highest w " << highest_weight << endl;
+      cout << "highest w " << highest_weight << endl;
 		  cout << "average w " << weight_sum/num_particles << endl;
 
           json msgJson;
