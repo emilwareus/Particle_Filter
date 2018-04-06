@@ -88,7 +88,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		if (fabs(yaw_rate) < EPS){
 			particles[i].x += velocity*delta_t*(sin(particles[i].theta));
 			particles[i].y += velocity*delta_t*(sin(particles[i].theta);
-		else{
+		}else{
 			particles[i].x += velocity/yaw_rate*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta));
 			particles[i].y += velocity/yaw_rate*(-cos(particles[i].theta + yaw_rate*delta_t) + cos(particles[i].theta));
 			particles[i].theta += yaw_rate/delta_t;
@@ -107,14 +107,14 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
 	//   implement this method and use it as a helper during the updateWeights phase.
 
-	for(int i = 0; i < observations.length; i++){
+	for(int i = 0; i < observations.size(); i++){
 
 		double min = numeric_limits<double>::max();
 		int id = 0;
 
-		for(int pred = 0; pred < predicted.length; pred++){
+		for(int pred = 0; pred < predicted.size(); pred++){
 			
-			double dist = dist(observations[i].x, observations[i].y, predicted[pred].x, predicted[pred].y);
+			double dist = sqrt((observations[i].x - predicted[pred].x) * (observations[i].x - predicted[pred].x) + (observations[i].y- predicted[pred].y)*(observations[i].y- predicted[pred].y));
 
 			if(dist < min){
 				min = dist;
@@ -129,7 +129,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 }
 
 
-double get_gaus_weight(double sig_x, double sig_y, x_obs, y_obs, mu_x, mu_y){
+double get_gaus_weight(double sig_x, double sig_y, double x_obs, double y_obs, double mu_x, double mu_y){
 	// calculate normalization term
 	double gauss_norm= (1.0/(2.0 * M_PI * sig_x * sig_y));
 
@@ -179,7 +179,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		//Transform to Map-space
 		vector<LandmarkObs> observations_map;
-		for(int j=0; j<observations.length; j++){
+		for(int j=0; j<observations.size(); j++){
 			observations_map.push_back(LandmarkObs{ observations[j].id, 
 						(particles[i].x + (cos(particles[i].theta)*observations[j].x) - (sin(particles[i].theta)*observations[j].y)),
 						(particles[i].y + (sin(particles[i].theta)*observations[j].x) + (cos(particles[i].theta)*observations[j].y))});
@@ -198,7 +198,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			double weight = 0.0;
 			for (unsigned int k = 0; k < predictions.size(); k++) {
 				if (predictions[k].id == observations_map[j].id) {
-					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map.x_f, observations_map.y_f, predictions[k].x, predictions[k].y);
+					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map.x, observations_map.y, predictions[k].x, predictions[k].y);
 					break;
 				}
 			}
