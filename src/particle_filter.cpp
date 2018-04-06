@@ -108,6 +108,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
+	cout << "Prediction" << endl;
 	
 	default_random_engine gen;
 	normal_distribution<double> dist_x(0, std_pos[0]);
@@ -129,6 +130,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particles[i].theta +=  dist_theta(gen);
 	}
 
+	cout << "Done with predict" << endl;
 	
 }
 
