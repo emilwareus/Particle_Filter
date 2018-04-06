@@ -62,7 +62,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1. 
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-	particles.clear();
+	
 	num_particles = 50;	
 
 	gaussian_init(x, y, theta, std[0], std[1], std[2], num_particles);
@@ -248,8 +248,9 @@ void ParticleFilter::resample() {
 	for(int i=0; i<num_particles; i++){
 		auto index = particle_dist(gen);
 		updated_particles[i] = move(particles[index]);
+		cout << updated_particles[i] << endl;
 	}
-	particles = move(updated_particles);
+	particles = updated_particles;
 	cout << "Resampeling done!" << endl;
 }
 
