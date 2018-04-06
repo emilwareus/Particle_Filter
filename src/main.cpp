@@ -116,7 +116,7 @@ int main()
       cout << "Test 1 " << endl;
 		  // Calculate and output the average weighted error of the particle filter over all time steps so far.
       cout << "Test size "<< pf.particles.size() << endl;
-		  vector<Particle> particles = pf.particles;
+		  vector<Particle> particles = move(pf.particles);
       cout << "Test 12 " << endl;
 		  int num_particles = particles.size();
       cout << "Test 13 " << endl;
