@@ -51,7 +51,7 @@ void ParticleFilter::gaussian_init(double gps_x, double gps_y, double theta, dou
 		part.weight = 1.0;
 		cout << part.weight << endl;
 		
-		weights.push_back(part.weight)
+		weights.push_back(part.weight);
 		particles.push_back(part);				
 		 
 	}
