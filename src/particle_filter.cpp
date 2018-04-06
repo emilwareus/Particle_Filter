@@ -80,14 +80,14 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 
 
 	default_random_engine gen;
-	normal_distribution<double> dist_x(0, std[0]);
-	normal_distribution<double> dist_y(0, std[1]);
-	normal_distribution<double> dist_theta(0, std[2]);
+	normal_distribution<double> dist_x(0, std_pos[0]);
+	normal_distribution<double> dist_y(0, std_pos[1]);
+	normal_distribution<double> dist_theta(0, std_pos[2]);
 
 	for(int i = 0; i < num_particles; i++){
 		if (fabs(yaw_rate) < EPS){
 			particles[i].x += velocity*delta_t*(sin(particles[i].theta));
-			particles[i].y += velocity*delta_t*(sin(particles[i].theta);
+			particles[i].y += velocity*delta_t*(sin(particles[i].theta));
 		}else{
 			particles[i].x += velocity/yaw_rate*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta));
 			particles[i].y += velocity/yaw_rate*(-cos(particles[i].theta + yaw_rate*delta_t) + cos(particles[i].theta));
@@ -198,7 +198,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			double weight = 0.0;
 			for (unsigned int k = 0; k < predictions.size(); k++) {
 				if (predictions[k].id == observations_map[j].id) {
-					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map.x, observations_map.y, predictions[k].x, predictions[k].y);
+					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
 					break;
 				}
 			}
