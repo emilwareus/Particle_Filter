@@ -79,7 +79,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
-
+	cout << "Let's Predict!"<< endl;
 	default_random_engine gen;
 	normal_distribution<double> dist_x(0, std_pos[0]);
 	normal_distribution<double> dist_y(0, std_pos[1]);
@@ -99,6 +99,8 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particles[i].y +=  dist_y(gen);
 		particles[i].theta +=  dist_theta(gen);
 	}
+
+	cout << "Prediction done!"<< endl;
 
 }
 
@@ -158,6 +160,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	//   http://planning.cs.uiuc.edu/node99.html
 
 
+	cout << "Let's update the weights" << endl;
 	//Loop over all particles 
 	for(int i = 0; i < num_particles; i++){
 
@@ -245,7 +248,7 @@ void ParticleFilter::resample() {
 		updated_particles[i] = move(particles[index]);
 	}
 	particles = move(updated_particles);
-
+	cout << "Weights done!"<< endl;
 }
 
 Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
