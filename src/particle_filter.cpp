@@ -250,7 +250,7 @@ void ParticleFilter::resample() {
 		updated_particles[i] = move(particles[index]);
 		
 	}
-	particles = updated_particles;
+	particles = move(updated_particles);
 	cout << "Resampeling done!" << endl;
 }
 
