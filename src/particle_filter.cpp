@@ -69,6 +69,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	
 	bool is_initialized = true;
 	
+	cout << "Initialized!"<< endl;
 
 }
 
