@@ -112,37 +112,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	cout << "Prediction" << endl;
 	  std::default_random_engine gen;
 
- 
-	for (int i = 0; i < num_particles; ++i) {
-
-		double x;
-		double y;
-		double theta;
-
-		if (yaw_rate) {
-		x = particles[i].x + velocity / yaw_rate *
-								(sin(particles[i].theta + yaw_rate * delta_t) -
-									sin(particles[i].theta));
-		y = particles[i].y + velocity / yaw_rate *
-								(cos(particles[i].theta) -
-									cos(particles[i].theta + yaw_rate * delta_t));
-		theta = particles[i].theta + yaw_rate * delta_t;
-		} else {
-		x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
-		y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
-		theta = particles[i].theta;
-		}
-
-		std::normal_distribution<double> N_x(x, std_pos[0]);
-		std::normal_distribution<double> N_y(y, std_pos[1]);
-		std::normal_distribution<double> N_theta(theta, std_pos[2]);
-
-		particles[i].x = N_x(gen);
-		particles[i].y = N_y(gen);
-		particles[i].theta = N_theta(gen);
-	
-	}
-	/*
 	std::default_random_engine gen;
 	std::normal_distribution<double> dist_x(0, std_pos[0]);
 	std::normal_distribution<double> dist_y(0, std_pos[1]);
@@ -162,7 +131,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		particles[i].y +=  dist_y(gen);
 		particles[i].theta +=  dist_theta(gen);
 	}
-	*/
+	
 	cout << "Done with predict" << endl;
 	
 }
@@ -176,20 +145,19 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 	for(int i = 0; i < observations.size(); i++){
 
 		double min = numeric_limits<double>::max();
-		int id = 0;
+
 
 		for(int pred = 0; pred < predicted.size(); pred++){
 			
-			double dist = sqrt((observations[i].x - predicted[pred].x) * (observations[i].x - predicted[pred].x) + (observations[i].y- predicted[pred].y)*(observations[i].y- predicted[pred].y));
-
+			double dist = dist(predicted[pred].x, predicted[pred].y, observations[i].x, observations[i].y);
 			if(dist < min){
 				min = dist;
-				id = predicted[pred].id;
+				observations[i].id = predicted[pred].id;
 			}
 
 
 		}
-		observations[i].id = id; 
+		 
 	}
 
 }
@@ -306,7 +274,7 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	
-	
+	/*
 	default_random_engine gen;
 
 	weights.clear();
@@ -324,6 +292,19 @@ void ParticleFilter::resample() {
 		
 	}
 	particles = move(updated_particles);
+	*/
+	
+	std::vector<Particle> resampled_p;
+
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::discrete_distribution<int> d(weights.begin(), weights.end());
+
+	for (int n = 0; n < num_particles; ++n) {
+		resampled_p.push_back(particles[d(gen)]);
+	}
+
+	particles = resampled_p;
 	
 }
 
