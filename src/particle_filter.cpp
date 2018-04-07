@@ -246,10 +246,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			// Handle if weight is 0
 			if (weight < EPS) {
 				particles[i].weight *= EPS;
-				wieghts[i] = particles[i].weight;
+				weights[i] = particles[i].weight;
 			}else {
 				particles[i].weight *= weight;
-				wieghts[i] = particles[i].weight;
+				weights[i] = particles[i].weight;
 			}
 
 			//Save result
