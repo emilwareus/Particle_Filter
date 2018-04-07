@@ -38,41 +38,40 @@ void print_particle(std::vector<Particle> &particles, int i) {
             << " weight: " << particles[i].weight << endl;
 }
 
+void ParticleFilter::init(double x, double y, double theta, double std[]) {
+  // TODO: Set the number of particles. Initialize all particles to first
+  // position (based on estimates of
+  //   x, y, theta and their uncertainties from GPS) and all weights to 1.
+  // Add random Gaussian noise to each particle.
+  // NOTE: Consult particle_filter.h for more information about this method (and
+  // others in this file).
 
-// @param gps_x 	GPS provided x position
-// @param gps_y 	GPS provided y position
-// @param theta		GPS provided yaw
-void ParticleFilter::gaussian_init(double gps_x, double gps_y, double theta, double std_x, double std_y, double std_theta, int num_particles) {
-	default_random_engine gen;
-	// Standard deviations for x, y, and theta
+  num_particles = 50;
 
-	// This line creates a normal (Gaussian) distribution for x, y and theta
-	normal_distribution<double> dist_x(gps_x, std_x);
-	normal_distribution<double> dist_y(gps_y, std_y);
-	normal_distribution<double> dist_theta(theta, std_theta);
-	
-	for (int i = 0; i < num_particles; ++i) {
-		double sample_x, sample_y, sample_theta;
-		
-		sample_x = dist_x(gen);
-		sample_y = dist_y(gen);
-		sample_theta = dist_theta(gen);	 
+  std::default_random_engine gen;
 
-		Particle part;
-		part.id = i;
-		part.x = sample_x;
-		part.y = sample_y;
-		part.theta = sample_theta;
-		part.weight = 1.0;
-		
-		weights.push_back(part.weight);
-		particles.push_back(part);				
-		 
-	}
+  std::normal_distribution<double> N_x(x, std[0]);
+  std::normal_distribution<double> N_y(y, std[1]);
+  std::normal_distribution<double> N_theta(theta, std[2]);
 
+  if (debug)
+    std::cout << "INIT" << endl; // DEBUG
+  for (int i = 0; i < num_particles; ++i) {
+    Particle p;
+    p.id = i;
+    p.x = N_x(gen);
+    p.y = N_y(gen);
+    p.theta = N_theta(gen);
+    p.weight = 1;
+    particles.push_back(p);
+    weights.push_back(1);
+    if (debug && i < 10) {
+      print_particle(particles, i);
+    } // DEBUG
+  }
+
+  is_initialized = true;
 }
-
-
 
 void ParticleFilter::prediction(double delta_t, double std_pos[],
                                 double velocity, double yaw_rate) {
