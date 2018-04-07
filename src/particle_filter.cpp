@@ -94,7 +94,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		}else{
 			x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
 			y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
-			theat = particles[i].theta;
+			theta = particles[i].theta;
 		}
 
 		
