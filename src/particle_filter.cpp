@@ -231,11 +231,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		double weight = 1.0;
 		for(int j=0; j<observations_map.size(); j++){
 			
-			int lm_index = lm_index_from_id(predicted_lm, transformed_obs[j].id);
-			double l_x = predicted_lm[lm_index].x;
-			double l_y = predicted_lm[lm_index].y;
-			final_weight *= multi_gauss(transformed_obs[j].x, transformed_obs[j].y,
-									lm_x, lm_y, std_landmark[0], std_landmark[1]);
+			int lm_index = lm_index_from_id(predictions, observations_map[j].id);
+			double l_x = predictions[lm_index].x;
+			double l_y = predictions[lm_index].y;
+			weight *= multi_gauss(observations_map[j].x, observations_map[j].y,
+									l_x, l_y, std_landmark[0], std_landmark[1]);
 			}
 			
 			/*
@@ -258,8 +258,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 
 	
-		particles[i].weight = final_weight;
-		weights[i] = final_weight;
+		particles[i].weight = weight;
+		weights[i] = weight;
 	}
 	
 }
