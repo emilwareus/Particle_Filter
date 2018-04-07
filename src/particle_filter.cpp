@@ -277,7 +277,7 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	
-	/*
+	
 	default_random_engine gen;
 
 	weights.clear();
@@ -295,19 +295,8 @@ void ParticleFilter::resample() {
 		
 	}
 	particles = move(updated_particles);
-	*/
 	
-	std::vector<Particle> resampled_p;
-
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::discrete_distribution<int> d(weights.begin(), weights.end());
-
-	for (int n = 0; n < num_particles; ++n) {
-		resampled_p.push_back(particles[d(gen)]);
-	}
-
-	particles = resampled_p;
+	
 	
 }
 
