@@ -24,6 +24,10 @@ using namespace std;
 
 #define EPS 0.00001 
 
+double dist(double x1, double y1, double x2, double y2) {
+	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
 // @param gps_x 	GPS provided x position
 // @param gps_y 	GPS provided y position
 // @param theta		GPS provided yaw
@@ -110,8 +114,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	//  http://www.cplusplus.com/reference/random/default_random_engine/
 
 	cout << "Prediction" << endl;
-	  std::default_random_engine gen;
-
+	
 	std::default_random_engine gen;
 	std::normal_distribution<double> dist_x(0, std_pos[0]);
 	std::normal_distribution<double> dist_y(0, std_pos[1]);
