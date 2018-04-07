@@ -69,6 +69,51 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	cout << "Initialized!"<< endl;
 }
 
+void ParticleFilter::prediction(double delta_t, double std_pos[],
+                                double velocity, double yaw_rate) {
+  // TODO: Add velocity and yaw rate measurements to each particle and add
+  // random Gaussian noise to predict the car's position (pose). NOTE: When
+  // adding noise you may find std::normal_distribution and
+  // std::default_random_engine useful.
+  //  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
+  //  http://www.cplusplus.com/reference/random/default_random_engine/
+
+  std::default_random_engine gen;
+
+  if (debug)
+    std::cout << "PREDICT" << endl; // DEBUG
+  for (int i = 0; i < num_particles; ++i) {
+
+    double x;
+    double y;
+    double theta;
+
+    if (yaw_rate) {
+      x = particles[i].x + velocity / yaw_rate *
+                               (sin(particles[i].theta + yaw_rate * delta_t) -
+                                sin(particles[i].theta));
+      y = particles[i].y + velocity / yaw_rate *
+                               (cos(particles[i].theta) -
+                                cos(particles[i].theta + yaw_rate * delta_t));
+      theta = particles[i].theta + yaw_rate * delta_t;
+    } else {
+      x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
+      y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
+      theta = particles[i].theta;
+    }
+
+    std::normal_distribution<double> N_x(x, std_pos[0]);
+    std::normal_distribution<double> N_y(y, std_pos[1]);
+    std::normal_distribution<double> N_theta(theta, std_pos[2]);
+
+    particles[i].x = N_x(gen);
+    particles[i].y = N_y(gen);
+    particles[i].theta = N_theta(gen);
+    if (debug)
+      print_particle(particles, i); // DEBUG
+  }
+}
+/*
 void ParticleFilter::prediction(double delta_t, double std_pos[], double velocity, double yaw_rate) {
 	// TODO: Add measurements to each particle and add random Gaussian noise.
 	// NOTE: When adding noise you may find std::normal_distribution and std::default_random_engine useful.
@@ -100,6 +145,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 	cout << "Done with predict" << endl;
 	
 }
+*/
 
 void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
 	// TODO: Find the predicted measurement that is closest to each observed measurement and assign the 
