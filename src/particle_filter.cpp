@@ -118,40 +118,33 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   }
 }
 
-void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted,
-                                     std::vector<LandmarkObs> &observations) {
-  // TODO: Find the predicted measurement (position of landmark from the map)
-  // that is closest to each observed measurement and assign the
-  //   observed measurement to this particular landmark.
-  // NOTE: this method will NOT be called by the grading code. But you will
-  // probably find it useful to
-  //   implement this method and use it as a helper during the updateWeights
-  //   phase.
+void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations) {
+	// TODO: Find the predicted measurement that is closest to each observed measurement and assign the 
+	//   observed measurement to this particular landmark.
+	// NOTE: this method will NOT be called by the grading code. But you will probably find it useful to 
+	//   implement this method and use it as a helper during the updateWeights phase.
 
-  if (debug)
-    std::cout << "LANDMARK ASSOCATION" << endl; // DEBUG
+	for(int i = 0; i < observations.size(); i++){
 
-  for (int i = 0; i < observations.size(); ++i) {
-    double distance_min;
-    if (debug)
-      std::cout << "Observation: " << i << endl; // DEBUG
-    distance_min = 1000.0;
-    for (int j = 0; j < predicted.size(); ++j) {
-      double pred_to_obs;
-      pred_to_obs = dist_2(predicted[j].x, predicted[j].y, observations[i].x,
-                         observations[i].y);
-      // std::cout << "landmark: " << predicted[j].id
-      //<< " distance: " << pred_to_obs << endl; // DEBUG
-      if (pred_to_obs < distance_min) {
-        distance_min = pred_to_obs;
-        observations[i].id = predicted[j].id;
-      }
-    }
-    if (debug)
-      std::cout << "associate landmark: " << observations[i].id
-                << " distance: " << distance_min << endl; // DEBUG
-  }
+		double min = numeric_limits<double>::max();
+
+
+		for(int pred = 0; pred < predicted.size(); pred++){
+			
+			double dist = dist_2(predicted[pred].x, predicted[pred].y, observations[i].x, observations[i].y);
+			if(dist < min){
+				min = dist;
+				observations[i].id = predicted[pred].id;
+			}
+
+
+		}
+		 
+	}
+
 }
+
+
 
 int lm_index_from_id(std::vector<LandmarkObs> predicted_lm, int id) {
   for (int i = 0; i < predicted_lm.size(); ++i) {
@@ -234,26 +227,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 									l_x, l_y, std_landmark[0], std_landmark[1]);
 		}
 			
-			/*
-			// Handle if weight is 0
-			if (weight < EPS) {
-				particles[i].weight *= EPS;
-				weights[i] = particles[i].weight;
-			}else {
-				particles[i].weight *= weight;
-				weights[i] = particles[i].weight;
-			}
 
-		
-			//Save result
-			associations.push_back(observations_map[j].id);
-			sense_x.push_back(observations_map[j].x);
-			sense_y.push_back(observations_map[j].y);
-			*/
-		
-
-
-	
 		particles[i].weight = weight;
 		weights[i] = weight;
 	}
