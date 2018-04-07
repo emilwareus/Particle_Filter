@@ -109,15 +109,15 @@ int main()
 				obs.y = y_sense[i];
 				noisy_observations.push_back(obs);
         	}
-
+      cout << "test 0"<< endl;
 		  // Update the weights and resample
 		  pf.updateWeights(sensor_range, sigma_landmark, noisy_observations, map);
 		  pf.resample();
       
 		  // Calculate and output the average weighted error of the particle filter over all time steps so far.
-      
+      cout << "test 1 "<< endl;
 		  vector<Particle> particles = pf.particles;
-      
+      cout << "test 2 "<< endl;
 		  int num_particles = particles.size();
       
 		  double highest_weight = -1.0;
