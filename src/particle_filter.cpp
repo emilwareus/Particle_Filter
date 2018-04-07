@@ -80,8 +80,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 
   std::default_random_engine gen;
 
-  if (debug)
-    std::cout << "PREDICT" << endl; // DEBUG
+  
   for (int i = 0; i < num_particles; ++i) {
 
     double x;
@@ -109,8 +108,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     particles[i].x = N_x(gen);
     particles[i].y = N_y(gen);
     particles[i].theta = N_theta(gen);
-    if (debug)
-      print_particle(particles, i); // DEBUG
+   
   }
 }
 /*
