@@ -176,6 +176,7 @@ double get_gaus_weight(double sig_x, double sig_y, double x_obs, double y_obs, d
 
 }
 
+/*
 
 int lm_index_from_id(std::vector<LandmarkObs> predicted_lm, int id) {
   for (int i = 0; i < predicted_lm.size(); ++i) {
@@ -258,24 +259,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
     // Update particle weights with Multivariate-Gaussian Probability Density
     // Combine the probabilities to arrive at final weights (Posterior
     // Probability)
-    double final_weight;
-    final_weight = 1.0;
-    for (int j = 0; j < transformed_obs.size(); ++j) {
-      double lm_x, lm_y;
-      int lm_index = lm_index_from_id(predicted_lm, transformed_obs[j].id);
-      lm_x = predicted_lm[lm_index].x;
-      lm_y = predicted_lm[lm_index].y;
-      
-      final_weight *= multi_gauss(transformed_obs[j].x, transformed_obs[j].y,
-                                  lm_x, lm_y, std_landmark[0], std_landmark[1]);
-    }
-    particles[i].weight = final_weight;
-    weights[i] = final_weight;
-   
+
 }
 
 }
-/*
+*/
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
 	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
@@ -320,6 +308,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<LandmarkObs> observations_map;
 		for(int j=0; j<observations.size(); j++){
 			LandmarkObs landmark;
+			landmark.id = j;
 			landmark.x = (particles[i].x + (cos(particles[i].theta)*observations[j].x) - (sin(particles[i].theta)*observations[j].y));
 			landmark.y = (particles[i].y + (sin(particles[i].theta)*observations[j].x) + (cos(particles[i].theta)*observations[j].y));
 			observations_map.push_back(landmark);
@@ -333,12 +322,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		vector<double> sense_y;
 
 		// Calculate particle weight
+		double weight = 1.0;
 		for(int j=0; j<observations_map.size(); j++){
 			// get the x,y coordinates of the landmark
-			double weight = 1.0;
 			for (unsigned int k = 0; k < predictions.size(); k++) {
 				if (predictions[k].id == observations_map[j].id) {
-					weight = get_gaus_weight(std_landmark[0], std_landmark[0], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
+					weight = get_gaus_weight(std_landmark[0], std_landmark[1], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
 					break;
 				}
 			}
@@ -365,7 +354,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	}
 	
 }
-*/
+
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
