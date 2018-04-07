@@ -24,7 +24,7 @@ using namespace std;
 
 #define EPS 0.00001 
 
-double dist(double x1, double y1, double x2, double y2) {
+double dist_2(double x1, double y1, double x2, double y2) {
 	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
@@ -152,7 +152,7 @@ void ParticleFilter::dataAssociation(std::vector<LandmarkObs> predicted, std::ve
 
 		for(int pred = 0; pred < predicted.size(); pred++){
 			
-			double dist = dist(predicted[pred].x, predicted[pred].y, observations[i].x, observations[i].y);
+			double dist = dist_2(predicted[pred].x, predicted[pred].y, observations[i].x, observations[i].y);
 			if(dist < min){
 				min = dist;
 				observations[i].id = predicted[pred].id;
