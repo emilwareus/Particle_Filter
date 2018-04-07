@@ -172,6 +172,22 @@ double multi_gauss(double x, double y, double lm_x, double lm_y, double std_x,
   return p;
 }
 
+
+
+double get_gaus_weight(double sig_x, double sig_y, double x_obs, double y_obs, double mu_x, double mu_y){
+	// calculate normalization term
+	double gauss_norm= (1.0/(2.0 * M_PI * sig_x * sig_y));
+
+	// calculate exponent
+	double exponent= ((x_obs - mu_x)*(x_obs - mu_x))/(2 * sig_x*sig_x) + ((y_obs - mu_y)*(y_obs - mu_y))/(2 * sig_y*sig_y);
+
+	// calculate weight using normalization terms and exponent
+	double weight= gauss_norm * exp(-exponent);
+	return weight;
+
+}
+
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
 		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
 	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
