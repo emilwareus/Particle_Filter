@@ -176,6 +176,26 @@ double get_gaus_weight(double sig_x, double sig_y, double x_obs, double y_obs, d
 
 }
 
+
+int lm_index_from_id(std::vector<LandmarkObs> predicted_lm, int id) {
+  for (int i = 0; i < predicted_lm.size(); ++i) {
+    if (predicted_lm[i].id == id) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+double multi_gauss(double x, double y, double lm_x, double lm_y, double std_x,
+                   double std_y) {
+  double a = pow(x - lm_x, 2.0) / (2.0 * pow(std_x, 2.0));
+  double b = pow(y - lm_y, 2.0) / (2.0 * pow(std_y, 2.0));
+  double p = exp(-(a + b)) / (2.0 * M_PI * std_x * std_y);
+  
+  return p;
+}
+
+
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const std::vector<LandmarkObs> &observations,
                                    const Map &map_landmarks) {
