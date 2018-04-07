@@ -234,9 +234,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			int lm_index = lm_index_from_id(predictions, observations_map[j].id);
 			double l_x = predictions[lm_index].x;
 			double l_y = predictions[lm_index].y;
-			weight *= multi_gauss(observations_map[j].x, observations_map[j].y,
+			weight *= gauss(observations_map[j].x, observations_map[j].y,
 									l_x, l_y, std_landmark[0], std_landmark[1]);
-			}
+		}
 			
 			/*
 			// Handle if weight is 0
@@ -254,7 +254,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			sense_x.push_back(observations_map[j].x);
 			sense_y.push_back(observations_map[j].y);
 			*/
-		}
+		
 
 
 	
