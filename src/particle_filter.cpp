@@ -94,12 +94,12 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		}else{
 			x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
 			y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
-			theat = particles[i].theat;
+			theat = particles[i].theta;
 		}
 
 		
 		std::normal_distribution<double> dist_x(x, std_pos[0]);
-		std::normal_distribution<double> dist_y(y§, std_pos[1]);
+		std::normal_distribution<double> dist_y(y, std_pos[1]);
 		std::normal_distribution<double> dist_theta(theta, std_pos[2]);
 
 		particles[i].x =  dist_x(gen);
