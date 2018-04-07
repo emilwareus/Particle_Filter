@@ -162,9 +162,8 @@ double multi_gauss(double x, double y, double lm_x, double lm_y, double std_x,
   return p;
 }
 
-void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-                                   const std::vector<LandmarkObs> &observations,
-                                   const Map &map_landmarks) {
+void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
+		const std::vector<LandmarkObs> &observations, const Map &map_landmarks)  {
   // TODO: Update the weights of each particle using a mult-variate Gaussian
   // distribution. You can read
   //   more about this distribution here:
