@@ -59,20 +59,19 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 
 	for (int i = 0; i < num_particles; ++i) {
 
-		Particle part;
-		part.id = i;
-		part.x = dist_x(gen);
-		part.y = dist_y(gen);
-		part.theta = dist_theta(gen);	 
-		part.weight = 1;
-		
-		weights.push_back(1);
-		particles.push_back(part);				
+		Particle p;
+		p.id = i;
+		p.x = dist_x(gen);
+		p.y = dist_y(gen);
+		p.theta = dist_theta(gen);
+		p.weight = 1;
+		particles.push_back(p);
+		weights.push_back(1);			
 			
 	}
 
 	
-	bool is_initialized = true;
+	is_initialized = true;
 	
 	cout << "Initialized!"<< endl;
 
@@ -481,20 +480,16 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 		//Vector of landmarks within sensor range
 		vector<LandmarkObs> predictions;
-		for(int land = 0 ; land < map_landmarks.landmark_list.size(); land ++){
-			float lx = map_landmarks.landmark_list[land].x_f;
-      		float ly = map_landmarks.landmark_list[land].y_f;
-			int id = map_landmarks.landmark_list[land].id_i;
-
-			double range_x = lx - particles[i].x;
-			double range_y = ly - particles[i].x;
-
+		for(int j = 0 ; j < map_landmarks.landmark_list.size(); j ++){
+			double range = dist(particles[i].x, particles[i].y,
+               map_landmarks.landmark_list[j].x_f,
+               map_landmarks.landmark_list[j].y_f);
 			//Add to list of in-range landmarks
-			if((range_x*range_x + range_y*range_y) <= sensor_range*sensor_range){
+			if(range <= sensor_range){
 				LandmarkObs landmark;
-				landmark.id = id;
-				landmark.x = lx; 
-				landmark.y = ly;
+				landmark.id = map_landmarks.landmark_list[j].id_i;
+				landmark.x = map_landmarks.landmark_list[j].x_f;
+				landmark.y = map_landmarks.landmark_list[j].y_f;
 				predictions.push_back(landmark);
 			}
 		}
@@ -514,45 +509,24 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		dataAssociation(predictions, observations_map);
 
 		
-		vector<int> associations;
-		vector<double> sense_x;
-		vector<double> sense_y;
 		
 		// Calculate particle weight
 		double weight = 1.0;
 		for(int j=0; j<observations_map.size(); j++){
-			// get the x,y coordinates of the landmark
-			for (unsigned int k = 0; k < predictions.size(); k++) {
-				if (predictions[k].id == observations_map[j].id) {
-					weight = get_gaus_weight(std_landmark[0], std_landmark[1], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
-					break;
-				}
-			}
 			
-			// Handle if weight is 0
-			if (weight < EPS) {
-				particles[i].weight *= EPS;
-				weights[i] = particles[i].weight;
-			}else {
-				particles[i].weight *= weight;
-				weights[i] = particles[i].weight;
-			}
-
-			
-			//Save result
-			associations.push_back(observations_map[j].id);
-			sense_x.push_back(observations_map[j].x);
-			sense_y.push_back(observations_map[j].y);
-			
+			int lm_index = lm_index_from_id(predictions, observations_map[j].id);
+			double l_x = predictions[lm_index].x;
+			double l_y = predictions[lm_index].y;
+			weight *= gauss(observations_map[j].x, observations_map[j].y,
+									l_x, l_y, std_landmark[0], std_landmark[1]);
 		}
+			
 
-		//Sets the associations of that particle
-		//particles[i] = SetAssociations(particles[i], associations, sense_x, sense_y);
-
+		particles[i].weight = weight;
+		weights[i] = weight;
 	}
 	
 }
-
 
 void ParticleFilter::resample() {
 	// TODO: Resample particles with replacement with probability proportional to their weight. 
