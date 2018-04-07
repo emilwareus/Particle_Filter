@@ -172,107 +172,99 @@ double multi_gauss(double x, double y, double lm_x, double lm_y, double std_x,
   return p;
 }
 
-void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
-                                   const std::vector<LandmarkObs> &observations,
-                                   const Map &map_landmarks) {
-  // TODO: Update the weights of each particle using a mult-variate Gaussian
-  // distribution. You can read
-  //   more about this distribution here:
-  //   https://en.wikipedia.org/wiki/Multivariate_normal_distribution
-  // NOTE: The observations are given in the VEHICLE'S coordinate system. Your
-  // particles are located
-  //   according to the MAP'S coordinate system. You will need to transform
-  //   between the two systems. Keep in mind that this transformation requires
-  //   both rotation AND translation (but no scaling). The following is a good
-  //   resource for the theory:
-  //   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
-  //   and the following is a good resource for the actual equation to implement
-  //   (look at equation 3.33 http://planning.cs.uiuc.edu/node99.html
+void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
+		const std::vector<LandmarkObs> &observations, const Map &map_landmarks) {
+	// TODO: Update the weights of each particle using a mult-variate Gaussian distribution. You can read
+	//   more about this distribution here: https://en.wikipedia.org/wiki/Multivariate_normal_distribution
+	// NOTE: The observations are given in the VEHICLE'S coordinate system. Your particles are located
+	//   according to the MAP'S coordinate system. You will need to transform between the two systems.
+	//   Keep in mind that this transformation requires both rotation AND translation (but no scaling).
+	//   The following is a good resource for the theory:
+	//   https://www.willamette.edu/~gorr/classes/GeneralGraphics/Transforms/transforms2d.htm
+	//   and the following is a good resource for the actual equation to implement (look at equation 
+	//   3.33
+	//   http://planning.cs.uiuc.edu/node99.html
 
-  if (debug) {
-    std::cout << "UPDATE WEIGHTS" << endl; // DEBUG
-    std::cout << "Landmarks: " << map_landmarks.landmark_list.size() << endl;
-  } // DEBUG
 
-  for (int i = 0; i < num_particles; ++i) {
-    std::vector<LandmarkObs> predicted_lm;
-    std::vector<LandmarkObs> transformed_obs;
+	
+	//Loop over all particles 
+	for(int i = 0; i < num_particles; i++){
 
-    if (debug && i < 10) {
-      std::cout << "Particle " << i << endl;
-    } // DEBUG
+		//Vector of landmarks within sensor range
+		vector<LandmarkObs> predictions;
+		for(int land = 0 ; land < map_landmarks.landmark_list.size(); land ++){
+			float lx = map_landmarks.landmark_list[land].x_f;
+      		float ly = map_landmarks.landmark_list[land].y_f;
+			int id = map_landmarks.landmark_list[land].id_i;
 
-    // Create a list of landmarks within range of particle sensors
-    for (int j = 0; j < map_landmarks.landmark_list.size(); ++j) {
-      double d;
-      d = dist_2(particles[i].x, particles[i].y,
-               map_landmarks.landmark_list[j].x_f,
-               map_landmarks.landmark_list[j].y_f);
-      if (d <= sensor_range) {
-        LandmarkObs lm;
-        lm.id = map_landmarks.landmark_list[j].id_i;
-        lm.x = map_landmarks.landmark_list[j].x_f;
-        lm.y = map_landmarks.landmark_list[j].y_f;
-        predicted_lm.push_back(lm);
-        if (debug) {
-          std::cout << "Landmark " << j << " x: " << lm.x << " y: " << lm.y
-                    << " distance " << d; // DEBUG
-          std::cout << " within sensor range" << endl;
-        } // DEBUG
-      }
-    }
+			double range_x = lx - particles[i].x;
+			double range_y = ly - particles[i].x;
 
-    if (debug)
-      std::cout << "Transform observations" << endl; // DEBUG
+			//Add to list of in-range landmarks
+			if((range_x*range_x + range_y*range_y) <= sensor_range*sensor_range){
+				LandmarkObs landmark;
+				landmark.id = id;
+				landmark.x = lx; 
+				landmark.y = ly;
+				predictions.push_back(landmark);
+			}
+		}
 
-    // Transform observations from car coordinates to map coordinates
-    for (int j = 0; j < observations.size(); ++j) {
-      LandmarkObs lm;
-      if (debug) {
-        std::cout << "Observation " << j; // DEBUG
-        std::cout << " x: " << observations[j].x << " y: " << observations[j].y
-                  << endl;
-      } // DEBUG
-      lm.x = particles[i].x + (cos(particles[i].theta) * observations[j].x) -
-             (sin(particles[i].theta) * observations[j].y);
-      lm.y = particles[i].y + (sin(particles[i].theta) * observations[j].x) +
-             (cos(particles[i].theta) * observations[j].y);
-      transformed_obs.push_back(lm);
-      if (debug) {
-        std::cout << "Transformed " << j;
-        std::cout << " x: " << lm.x << " y: " << lm.y << endl;
-      } // DEBUG
-    }
 
-    // Associate each landmark observation with nearest map landmark
-    dataAssociation(predicted_lm, transformed_obs);
+	
+		//Transform to Map-space
+		vector<LandmarkObs> observations_map;
+		for(int j=0; j<observations.size(); j++){
+			LandmarkObs landmark;
+			landmark.x = (particles[i].x + (cos(particles[i].theta)*observations[j].x) - (sin(particles[i].theta)*observations[j].y));
+			landmark.y = (particles[i].y + (sin(particles[i].theta)*observations[j].x) + (cos(particles[i].theta)*observations[j].y));
+			observations_map.push_back(landmark);
+		}
+		
+		//Associate observations to landmarks
+		dataAssociation(predictions, observations_map);
 
-    if (debug)
-      std::cout << "Update weights using multi gauss" << endl; // DEBUG
+		
+		vector<int> associations;
+		vector<double> sense_x;
+		vector<double> sense_y;
+		
+		// Calculate particle weight
+		double weight = 1.0;
+		for(int j=0; j<observations_map.size(); j++){
+			// get the x,y coordinates of the landmark
+			for (unsigned int k = 0; k < predictions.size(); k++) {
+				if (predictions[k].id == observations_map[j].id) {
+					weight = get_gaus_weight(std_landmark[0], std_landmark[1], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
+					break;
+				}
+			}
+			
+			// Handle if weight is 0
+			if (weight < EPS) {
+				particles[i].weight *= EPS;
+				weights[i] = particles[i].weight;
+			}else {
+				particles[i].weight *= weight;
+				weights[i] = particles[i].weight;
+			}
 
-    // Update particle weights with Multivariate-Gaussian Probability Density
-    // Combine the probabilities to arrive at final weights (Posterior
-    // Probability)
-    double final_weight;
-    final_weight = 1.0;
-    for (int j = 0; j < transformed_obs.size(); ++j) {
-      double lm_x, lm_y;
-      int lm_index = lm_index_from_id(predicted_lm, transformed_obs[j].id);
-      lm_x = predicted_lm[lm_index].x;
-      lm_y = predicted_lm[lm_index].y;
-      if (debug) {
-        std::cout << "Landmark x: " << lm_x;
-        std::cout << " Landmark y: " << lm_y;
-      } // DEBUG
-      final_weight *= multi_gauss(transformed_obs[j].x, transformed_obs[j].y,
-                                  lm_x, lm_y, std_landmark[0], std_landmark[1]);
-    }
-    particles[i].weight = final_weight;
-    weights[i] = final_weight;
-    if (debug)
-      std::cout << "Final weight: " << final_weight << endl; // DEBUG
-  }
+			/*
+			//Save result
+			associations.push_back(observations_map[j].id);
+			sense_x.push_back(observations_map[j].x);
+			sense_y.push_back(observations_map[j].y);
+			*/
+		}
+
+		//Sets the associations of that particle
+		//particles[i] = SetAssociations(particles[i], associations, sense_x, sense_y);
+
+	}
+	
 }
+
+
 
 void ParticleFilter::resample() {
   // TODO: Resample particles with replacement with probability proportional to
