@@ -162,30 +162,15 @@ int lm_index_from_id(std::vector<LandmarkObs> predicted_lm, int id) {
   return -1;
 }
 
-double multi_gauss(double x, double y, double lm_x, double lm_y, double std_x,
+double gauss(double x, double y, double lm_x, double lm_y, double std_x,
                    double std_y) {
   double a = pow(x - lm_x, 2.0) / (2.0 * pow(std_x, 2.0));
   double b = pow(y - lm_y, 2.0) / (2.0 * pow(std_y, 2.0));
   double p = exp(-(a + b)) / (2.0 * M_PI * std_x * std_y);
-  if (debug)
-    std::cout << " multi gauss:  " << p << endl; // DEBUG
   return p;
 }
 
 
-
-double get_gaus_weight(double sig_x, double sig_y, double x_obs, double y_obs, double mu_x, double mu_y){
-	// calculate normalization term
-	double gauss_norm= (1.0/(2.0 * M_PI * sig_x * sig_y));
-
-	// calculate exponent
-	double exponent= ((x_obs - mu_x)*(x_obs - mu_x))/(2 * sig_x*sig_x) + ((y_obs - mu_y)*(y_obs - mu_y))/(2 * sig_y*sig_y);
-
-	// calculate weight using normalization terms and exponent
-	double weight= gauss_norm * exp(-exponent);
-	return weight;
-
-}
 
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -241,21 +226,19 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		dataAssociation(predictions, observations_map);
 
 		
-		vector<int> associations;
-		vector<double> sense_x;
-		vector<double> sense_y;
 		
 		// Calculate particle weight
 		double weight = 1.0;
 		for(int j=0; j<observations_map.size(); j++){
-			// get the x,y coordinates of the landmark
-			for (unsigned int k = 0; k < predictions.size(); k++) {
-				if (predictions[k].id == observations_map[j].id) {
-					weight = get_gaus_weight(std_landmark[0], std_landmark[1], observations_map[j].x, observations_map[j].y, predictions[k].x, predictions[k].y);
-					break;
-				}
+			
+			int lm_index = lm_index_from_id(predicted_lm, transformed_obs[j].id);
+			double l_x = predicted_lm[lm_index].x;
+			double l_y = predicted_lm[lm_index].y;
+			final_weight *= multi_gauss(transformed_obs[j].x, transformed_obs[j].y,
+									lm_x, lm_y, std_landmark[0], std_landmark[1]);
 			}
 			
+			/*
 			// Handle if weight is 0
 			if (weight < EPS) {
 				particles[i].weight *= EPS;
@@ -265,7 +248,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 				weights[i] = particles[i].weight;
 			}
 
-			/*
+		
 			//Save result
 			associations.push_back(observations_map[j].id);
 			sense_x.push_back(observations_map[j].x);
@@ -273,9 +256,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			*/
 		}
 
-		//Sets the associations of that particle
-		//particles[i] = SetAssociations(particles[i], associations, sense_x, sense_y);
 
+	
+		particles[i].weight = final_weight;
+		weights[i] = final_weight;
 	}
 	
 }
