@@ -282,10 +282,10 @@ void ParticleFilter::resample() {
   particles = resampled_p;
 }
 
-Particle ParticleFilter::SetAssociations(Particle particle,
-                                         std::vector<int> associations,
-                                         std::vector<double> sense_x,
-                                         std::vector<double> sense_y) {
+Particle ParticleFilter::SetAssociations(Particle& particle, const std::vector<int>& associations, 
+                                     const std::vector<double>& sense_x, const std::vector<double>& sense_y) {
+
+											
   // particle: the particle to assign each listed association, and association's
   // (x,y) world coordinates mapping to
   // associations: The landmark id that goes along with each listed association
